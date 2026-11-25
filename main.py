@@ -56,6 +56,19 @@ def main():
     if error:
         print("gate failed: %s" % error, file=sys.stderr)
         return 1
+    # Independent re-check before writing: the entry must be 90-110 words
+    # and 1-600 UTF-8 characters. Fail loudly instead of writing bad output.
+    words = len(MONOLOGUE.split())
+    if not MIN_WORDS <= words <= MAX_WORDS:
+        raise ValueError(
+            "entry is %d words, outside %d-%d" % (words, MIN_WORDS, MAX_WORDS)
+        )
+    chars = len(MONOLOGUE.encode("utf-8").decode("utf-8"))
+    if not MIN_CHARS <= chars <= MAX_CHARS:
+        raise ValueError(
+            "entry is %d characters, outside %d-%d"
+            % (chars, MIN_CHARS, MAX_CHARS)
+        )
     out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
     os.makedirs(out_dir, exist_ok=True)
     path = os.path.join(out_dir, "entry.txt")
